@@ -107,3 +107,6 @@ def loadSettings(fileName='settings.json') -> bool:
         return False
     else:
         return True
+
+def getSettingsMap() -> dict:
+    return {name: option.value for name, option in _optionMap.items()}
