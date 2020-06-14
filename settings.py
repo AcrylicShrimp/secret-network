@@ -46,3 +46,64 @@ def _generateInitialSetting(fileName):
         print('please contact to led789zxpp@naver.com')
         print()
 
+#######################################################################################################
+
+def loadSettings(fileName='settings.json') -> bool:
+    global _optionMap
+
+    if not os.path.isfile(fileName):
+        _generateInitialSetting(fileName)
+        return False
+
+    try:
+        with open('settings.json', encoding='utf-8') as settings_file:
+            settings = json.load(settings_file)
+    except:
+        print('unable to load settings.json file :(')
+        print('please contact to led789zxpp@naver.com')
+        print()
+
+        return False
+
+    containsInvalidValue = False
+
+    for key, value in settings.items():
+        option = _optionMap.get(key)
+
+        if option is None:
+            jsonValue = json.dumps(value)
+            print('undefined setting "{}" found. (value: {}) :/'.format(key, jsonValue))
+            print('it is ignored and not stored in settings map...')
+            print()
+            continue
+
+        if (option.validator is not None) and (option.validator(value) is False):
+            jsonValue = json.dumps(value)
+            print('invalid setting "{}" found. (value: {}) :('.format(key, jsonValue))
+            print('please refer to docs and correct the setting.')
+            print('for more information, contact to led789zxpp@naver.com')
+            print()
+
+            containsInvalidValue = True
+            continue
+
+        option.value = value
+
+    if containsInvalidValue:
+        return False
+
+    someOptionsMissing = False
+
+    for name, option in _optionMap.items():
+        if option.required and option.value is None:
+            print('required setting "{}" not found. :('.format(name))
+            print('please refer to docs and fill out the setting.')
+            print('for more information, contact to led789zxpp@naver.com')
+            print()
+
+            someOptionsMissing = True
+
+    if someOptionsMissing:
+        return False
+    else:
+        return True
