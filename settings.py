@@ -1,3 +1,6 @@
+import json
+import os
+
 class _Option:
     def __init__(self, /, validator = None, initValue = None, required = False):
         if required and initValue is None:
@@ -23,3 +26,23 @@ _optionMap = {
     # int options
     'max-page-image-count': _Option(validator=_typeCheck(int), initValue=0, required=True),
 }
+
+#######################################################################################################
+
+def _generateInitialSetting(fileName):
+    global _optionMap
+
+    initDict = {name: option.initValue for name, option in _optionMap.items()}
+
+    try:
+        with open(fileName, 'w', encoding='utf-8') as settings_file:
+            settings_file.write(json.dumps(initDict, indent=4))
+
+        print('a settings.json file created :)')
+        print('please open and edit it to proceed!')
+        print()
+    except:
+        print('unable to create settings.json file :(')
+        print('please contact to led789zxpp@naver.com')
+        print()
+
