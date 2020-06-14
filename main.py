@@ -287,6 +287,11 @@ while True:
                 filename = '{} - {} {}.{}'.format(image['id'], image['title'].replace(
                     '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_'), index + 1, ext)
 
+                if os.path.isfile(os.path.join('images', filename)):
+                    print('duplicated filename detected')
+                    print('skipping')
+                    continue
+
                 image_response = requests.get(url, headers={
                     'Referer': 'https://app-api.pixiv.net/',
                 }, stream=True)
@@ -330,6 +335,11 @@ while True:
             ext = url.split('.')[-1]
             filename = '{} - {}.{}'.format(image['id'], image['title'].replace(
                 '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_'), ext)
+
+            if os.path.isfile(os.path.join('images', filename)):
+                print('duplicated filename detected')
+                print('skipping')
+                continue
 
             image_response = requests.get(url, headers={
                 'Referer': 'https://app-api.pixiv.net/',
