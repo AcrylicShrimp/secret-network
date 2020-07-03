@@ -36,106 +36,24 @@ import requests
 import shutil
 import sys
 
+from settings import loadSettings, getSettingsMap
+
 AUTH_HOST = 'https://oauth.secure.pixiv.net'
 SEARCH_HOST = 'https://app-api.pixiv.net'
 
 if not os.path.isdir('images'):
     os.mkdir('images')
 
-if not os.path.isfile('settings.json'):
-    try:
-        with open('settings.json', 'w', encoding='utf-8') as settings_file:
-            settings_file.writelines([
-                '{',
-                os.linesep,
-                '\t"username": "YOUR_USERNAME_HERE",',
-                os.linesep,
-                '\t"password": "YOUR_PASSWORD_HERE",',
-                os.linesep,
-                '\t"tags": "LastOrigin r-18",',
-                os.linesep,
-                '\t"max-page-image-count": 0',
-                os.linesep,
-                '}',
-            ])
-        print('a settings.json file created :)')
-        print('please open and edit it to proceed!')
-        try:
-            input('press ENTER to close')
-        except:
-            pass
-        sys.exit(0)
+loadSuccess = loadSettings('settings.json')
 
-    except SystemExit:
-        sys.exit(0)
-
-    except:
-        print('unable to create settings.json file :(')
-        print('please contact to led789zxpp@naver.com')
-        try:
-            input('press ENTER to close')
-        except:
-            pass
-        sys.exit(1)
-
-try:
-    with open('settings.json', encoding='utf-8') as settings_file:
-        settings = json.load(settings_file)
-except:
-    print('unable to load settings.json file :(')
-    print('please contact to led789zxpp@naver.com')
+if not loadSuccess:
     try:
         input('press ENTER to close')
     except:
         pass
-    sys.exit(1)
+    sys.exit(0)
 
-if 'username' not in settings:
-    print('username not found in the settings.json file :(')
-    print('please contact to led789zxpp@naver.com')
-    try:
-        input('press ENTER to close')
-    except:
-        pass
-    sys.exit(1)
-
-if 'password' not in settings:
-    print('username not found in the settings.json file :(')
-    print('please contact to led789zxpp@naver.com')
-    try:
-        input('press ENTER to close')
-    except:
-        pass
-    sys.exit(1)
-
-if 'tags' not in settings:
-    print('tags not found in the settings.json file :(')
-    print('please contact to led789zxpp@naver.com')
-    try:
-        input('press ENTER to close')
-    except:
-        pass
-    sys.exit(1)
-
-if 'max-page-image-count' not in settings:
-    print('max-page-image-count not found in the settings.json file :(')
-    print('please contact to led789zxpp@naver.com')
-    try:
-        input('press ENTER to close')
-    except:
-        pass
-    sys.exit(1)
-
-try:
-    settings['max-page-image-count'] = int(settings['max-page-image-count'])
-except:
-    print('max-page-image-count in the settings.json file is not an integer :(')
-    print('please contact to led789zxpp@naver.com')
-    try:
-        input('press ENTER to close')
-    except:
-        pass
-    sys.exit(1)
+settings = getSettingsMap()
 
 local_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S+00:00')
 
