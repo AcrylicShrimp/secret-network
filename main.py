@@ -2,30 +2,30 @@
 #
 # Written by
 #
-#     ___   _____ __         _               
-#    /   | / ___// /_  _____(_)___ ___  ____ 
+#     ___   _____ __         _
+#    /   | / ___// /_  _____(_)___ ___  ____
 #   / /| | \__ \/ __ \/ ___/ / __ `__ \/ __ \
 #  / ___ |___/ / / / / /  / / / / / / / /_/ /
-# /_/  |_/____/_/ /_/_/  /_/_/ /_/ /_/ .___/ 
-#                                   /_/      
+# /_/  |_/____/_/ /_/_/  /_/_/ /_/ /_/ .___/
+#                                   /_/
 #
 # Special thanks to
 #
-#     ____                   ________ 
-#    / __ \_________  ____  / ____/ / 
-#   / / / / ___/ __ \/ __ \/ /_  / /  
+#     ____                   ________
+#    / __ \_________  ____  / ____/ /
+#   / / / / ___/ __ \/ __ \/ /_  / /
 #  / /_/ / /  / /_/ / /_/ / __/ / /___
 # /_____/_/   \____/ .___/_/   /_____/
-#                 /_/                 
+#                 /_/
 #
 # and
 #
-#     ____                        
-#    / __ )____ _____  ____  ____ 
+#     ____
+#    / __ )____ _____  ____  ____
 #   / __  / __ `/ __ \/ __ \/ __ \
 #  / /_/ / /_/ / /_/ / /_/ / / / /
-# /_____/\__, /\____/\____/_/ /_/ 
-#       /____/                    
+# /_____/\__, /\____/\____/_/ /_/
+#       /____/
 #
 
 import datetime
@@ -206,6 +206,39 @@ try:
 except:
     pass
 
+while True:
+    print()
+    result = input(
+        'do you want to sort artworks in chronological descending(latest-first) order? [Y/n]: ').strip()
+
+    if result == '' or result == 'y' or result == 'Y':
+        sort = 'date_desc'
+        break
+    elif result == 'n' or result == 'N':
+        sort = 'date_asc'
+        break
+
+    print('please enter correct answer')
+
+while True:
+    print()
+    result = input(
+        'enter anchor artwork id (less than 1 will disable it): ').strip()
+
+    try:
+        limit_id = int(result)
+
+        if limit_id < 1:
+            limit_id = None
+
+        break
+
+    except:
+        pass
+
+    print('please enter correct number')
+
+halt = False
 search_url = None
 
 while True:
@@ -215,7 +248,7 @@ while True:
         search_result = requests.get('{}/v1/search/illust'.format(SEARCH_HOST), {
             'word': settings['tags'],
             'search_target': 'partial_match_for_tags',
-            'sort': 'date_desc',
+            'sort': sort,
         }, headers={
             'App-OS': 'ios',
             'App-OS-Version': '12.2',
@@ -246,6 +279,9 @@ while True:
     images = json.loads(search_result.text)
 
     for image in images['illusts']:
+        if halt:
+            break
+
         print('downloading:', image['title'])
 
         if 'meta_pages' in image and len(image['meta_pages']) != 0:
@@ -255,6 +291,28 @@ while True:
                 print('1 image found')
             else:
                 print('{} images found'.format(length))
+
+            if limit_id is not None:
+                try:
+                    image_id = int(image['id'])
+
+                    if sort == 'date_desc':
+                        if image_id < limit_id:
+                            print(
+                                'the id of this artwork({}) is lower than limit id({}).'.format(image_id, limit_id))
+                            print('halting')
+                            halt = True
+                            continue
+                    else:
+                        if image_id > limit_id:
+                            print(
+                                'the id of this artwork({}) is higher than limit id({}).'.format(image_id, limit_id))
+                            print('halting')
+                            halt = True
+                            continue
+
+                except:
+                    pass
 
             if 1 <= settings['max-page-image-count']:
                 if settings['max-page-image-count'] < length:
@@ -334,7 +392,7 @@ while True:
 
             ext = url.split('.')[-1]
             filename = '{} - {}.{}'.format(image['id'], image['title'].replace(
-                '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_'), ext)
+                '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_').replace('*', '_'), ext)
 
             if os.path.isfile(os.path.join('images', filename)):
                 print('duplicated filename detected')
@@ -347,6 +405,9 @@ while True:
 
             with open(os.path.join('images', filename), 'wb') as image_file:
                 shutil.copyfileobj(image_response.raw, image_file)
+
+    if halt:
+        break
 
     if 'next_url' not in images or images['next_url'] is None:
         print('no further image found!')
