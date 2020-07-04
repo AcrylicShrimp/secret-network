@@ -260,8 +260,18 @@ while True:
                     continue
 
                 ext = url.split('.')[-1]
-                filename = '{} - {} {}.{}'.format(image['id'], image['title'].replace(
-                    '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_'), index + 1, ext)
+                filename = '{} - {} {}.{}'.format(
+                    image['id'],
+                    image['title']
+                    .replace('/', '_')
+                    .replace('\\', '_')
+                    .replace(':', '_')
+                    .replace('*', '_')
+                    .replace('?', '_')
+                    .replace('"', '_')
+                    .replace('<', '_')
+                    .replace('>', '_')
+                    .replace('|', '_'), index + 1, ext)
 
                 if os.path.isfile(os.path.join('images', filename)):
                     print('duplicated filename detected')
@@ -309,8 +319,18 @@ while True:
                     continue
 
             ext = url.split('.')[-1]
-            filename = '{} - {}.{}'.format(image['id'], image['title'].replace(
-                '/', '_').replace('\\', '_').replace('?', '_').replace('!', '_').replace('|', '_').replace('"', '_').replace('\'', '_').replace(':', '_').replace('*', '_'), ext)
+            filename = '{} - {}.{}'.format(
+                image['id'],
+                image['title']
+                .replace('/', '_')
+                .replace('\\', '_')
+                .replace(':', '_')
+                .replace('*', '_')
+                .replace('?', '_')
+                .replace('"', '_')
+                .replace('<', '_')
+                .replace('>', '_')
+                .replace('|', '_'), ext)
 
             if os.path.isfile(os.path.join('images', filename)):
                 print('duplicated filename detected')
